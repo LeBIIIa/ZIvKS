@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Cezar
+namespace ZlvKS_Labs
 {
     public class CipherSolver
     {

@@ -1,4 +1,4 @@
-﻿namespace Cezar
+﻿namespace ZlvKS_Labs
 {
     partial class Form1
     {

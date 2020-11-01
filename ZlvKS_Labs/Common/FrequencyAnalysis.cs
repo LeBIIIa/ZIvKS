@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Cezar
+namespace ZlvKS_Labs
 {
     public class FrequencyAnalysis
     {

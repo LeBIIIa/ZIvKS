@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cezar.Common
+namespace ZlvKS_Labs.Common
 {
     public class FeistelCipher
     {

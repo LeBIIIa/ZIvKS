@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Cezar
+namespace ZlvKS_Labs
 {
     internal static class Program
     {

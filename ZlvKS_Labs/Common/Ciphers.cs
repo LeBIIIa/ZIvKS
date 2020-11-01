@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Cezar
+namespace ZlvKS_Labs
 {
     public class Ciphers
     {

@@ -1,4 +1,4 @@
-﻿using Cezar.Common;
+﻿using ZlvKS_Labs.Common;
 
 using System;
 using System.Collections;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Cezar
+namespace ZlvKS_Labs
 {
     public partial class Form1 : Form
     {
