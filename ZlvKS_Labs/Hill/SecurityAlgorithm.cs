@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,11 +22,15 @@ namespace ZlvKS_Labs.Hill
         }
 
         public abstract string Encrypt(string plainText);
-
         public abstract string Decrypt(string cipher);
 
         public abstract string Encrypt(string plainText, string key);
-
         public abstract string Decrypt(string cipher, string key);
+
+        public abstract void Encrypt(StreamReader inputStream, StreamWriter outputStream);
+        public abstract void Encrypt(StreamReader inputStream, StreamWriter outputStream, string key);
+
+        public abstract void Decrypt(StreamReader inputStream, StreamWriter outputStream);
+        public abstract void Decrypt(StreamReader inputStream, StreamWriter outputStream, string key);
     }
 }

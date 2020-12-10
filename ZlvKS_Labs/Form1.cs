@@ -589,14 +589,24 @@ namespace ZlvKS_Labs
                     MessageBox.Show("Введіть ключ!");
                     return;
                 }
-                if (string.IsNullOrEmpty(tbMessage67.Text.Trim()))
+                if (dOpenFile.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show("Введіть повідомлення!");
-                    return;
+                    if (dSaveFile.ShowDialog() == DialogResult.OK)
+                    {
+                        string key = tbKey67.Text;
+                        string input = File.ReadAllText(dOpenFile.FileName);
+                        if (string.IsNullOrEmpty(input))
+                        {
+                            MessageBox.Show("Немає що шифрувати!");
+                            return;
+                        }
+                        tbMessage67.Text = input;
+                        string output = job(input, key);
+                        File.WriteAllText(dSaveFile.FileName, output);
+                        tbResult67.Text = output;
+                    }
+                    MessageBox.Show("Виконано!");
                 }
-
-                string key = tbKey67.Text;
-                tbResult67.Text = job(tbMessage67.Text, tbKey67.Text);
             }
             catch (ArgumentException ar)
             {
