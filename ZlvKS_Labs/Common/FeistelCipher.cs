@@ -90,7 +90,6 @@ namespace ZlvKS_Labs.Common
         #endregion
 
         #region Files
-
         public static byte[] EncryptFile(byte[] fileInBytes, string fileOutPath, Func<byte, byte, byte> FunctionF, string key)
         {
             byte[] encFile = new byte[fileInBytes.Length];
@@ -113,7 +112,6 @@ namespace ZlvKS_Labs.Common
             File.WriteAllBytes(fileOutPath, decFile);
             return decFile;
         }
-
         #endregion
     }
 }

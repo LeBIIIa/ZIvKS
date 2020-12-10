@@ -9,6 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Security.Cryptography;
+using ZlvKS_Labs.Hill;
 
 namespace ZlvKS_Labs
 {
@@ -342,7 +344,7 @@ namespace ZlvKS_Labs
                                 break;
                             }
                             BitArray colorArray = ByteToBit(pixelColor.R);
-                            BitArray messageArray = ByteToBit(pixelColor.R); ;
+                            BitArray messageArray = ByteToBit(pixelColor.R);
                             messageArray[0] = colorArray[0];
                             messageArray[1] = colorArray[1];
 
@@ -567,6 +569,171 @@ namespace ZlvKS_Labs
         private void BtnDecrypt5_Click(object sender, EventArgs e)
         {
             DoJob5(FeistelCipher.DecryptFile);
+        }
+        #endregion
+
+        #region Lab6-7
+        private const int rank = 3;
+        readonly SecurityAlgorithm security = new Hill.Hill(new []{ Hill.Hill.SymbolType.Mask, Hill.Hill.SymbolType.Mask, Hill.Hill.SymbolType.Character }, rank);
+        private void DoJob67(Func<string, string, string> job)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(tbKey67.Text.Trim()))
+                {
+                    MessageBox.Show("Введіть ключ!");
+                    return;
+                }
+                if (tbKey67.Text.Length != 9)
+                {
+                    MessageBox.Show("Введіть ключ!");
+                    return;
+                }
+                if (string.IsNullOrEmpty(tbMessage67.Text.Trim()))
+                {
+                    MessageBox.Show("Введіть повідомлення!");
+                    return;
+                }
+
+                string key = tbKey67.Text;
+                tbResult67.Text = job(tbMessage67.Text, tbKey67.Text);
+            }
+            catch (ArgumentException ar)
+            {
+                MessageBox.Show(ar.Message);
+            }
+            catch
+            {
+                MessageBox.Show("Не вдалось зашифрувати/розшифрувати повідомлення!");
+            }
+        }
+
+        private void btnEncrypt67_Click(object sender, EventArgs e)
+        {
+            DoJob67(security.Encrypt);
+        }
+        private void btnDecrypt67_Click(object sender, EventArgs e)
+        {
+            DoJob67(security.Decrypt);
+        }
+        #endregion
+
+        #region Lab8
+        private const byte lenIV = 16;
+        private static void AesCtrTransform(
+            byte[] key, byte[] salt, Stream inputStream, Stream outputStream)
+        {
+            SymmetricAlgorithm aes =
+                new AesManaged { Mode = CipherMode.ECB, Padding = PaddingMode.None };
+
+            int blockSize = aes.BlockSize / 8;
+
+            if (salt.Length != blockSize)
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        "Salt size must be same as block size (actual: {0}, expected: {1})",
+                        salt.Length, blockSize));
+            }
+
+            byte[] counter = (byte[])salt.Clone();
+
+            Queue<byte> xorMask = new Queue<byte>();
+
+            var zeroIv = new byte[blockSize];
+            ICryptoTransform counterEncryptor = aes.CreateEncryptor(key, zeroIv);
+
+            int b;
+            while ((b = inputStream.ReadByte()) != -1)
+            {
+                if (xorMask.Count == 0)
+                {
+                    var counterModeBlock = new byte[blockSize];
+
+                    counterEncryptor.TransformBlock(
+                        counter, 0, counter.Length, counterModeBlock, 0);
+
+                    for (var i2 = counter.Length - 1; i2 >= 0; i2--)
+                    {
+                        if (++counter[i2] != 0)
+                        {
+                            break;
+                        }
+                    }
+
+                    foreach (var b2 in counterModeBlock)
+                    {
+                        xorMask.Enqueue(b2);
+                    }
+                }
+
+                var mask = xorMask.Dequeue();
+                outputStream.WriteByte((byte)(((byte)b) ^ mask));
+            }
+        }
+        
+        private void DoCipher()
+        {
+
+            try
+            {
+                if (string.IsNullOrEmpty(tbKey8.Text.Trim()))
+                {
+                    MessageBox.Show("Введіть ключ!");
+                    return;
+                }
+                if (string.IsNullOrEmpty(tbSalt8.Text.Trim()))
+                {
+                    MessageBox.Show("Введіть IV!");
+                    return;
+                }
+
+                byte[] keyBytes = Encoding.UTF8.GetBytes(tbKey8.Text);
+
+                int len = keyBytes.Length;
+                if (len != 16 && len != 24 && len != 32)
+                {
+                    MessageBox.Show("Розмір ключа повинен бути 16 літер(128-bit), 24 літер(192-bit), 32 літер(256-bit)! (" + len + ")");
+                    return;
+                }
+
+                string salt = tbSalt8.Text.Substring(0, Math.Min(tbSalt8.Text.Length, lenIV));
+                salt = salt.PadRight(16, salt[salt.Length - 1]);
+
+                tbSalt8.Enabled = false;
+                tbSalt8.Text = salt;
+                tbSalt8.Enabled = true;
+
+                byte[] saltBytes = Encoding.UTF8.GetBytes(salt);
+
+                if (dOpenFile.ShowDialog() == DialogResult.OK)
+                {
+                    using (FileStream fs = File.OpenRead(dOpenFile.FileName))
+                    {
+                        if (dSaveFile.ShowDialog() == DialogResult.OK)
+                        {
+                            using (FileStream fs2 = File.OpenWrite(dSaveFile.FileName))
+                            {
+                                AesCtrTransform(keyBytes, saltBytes, fs, fs2);
+                            }
+                        }
+                    }
+                    MessageBox.Show("Виконано!");
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Не вдалось зашифрувати/розшифрувати повідомлення!");
+            }
+        }
+
+        private void BtnEncrypt8_Click(object sender, EventArgs e)
+        {
+            DoCipher();
+        }
+        private void BtnDecrypt8_Click(object sender, EventArgs e)
+        {
+            DoCipher();
         }
         #endregion
     }
